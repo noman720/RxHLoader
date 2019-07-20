@@ -1,4 +1,4 @@
-package xyz.securetunnel.android.kotlin.reactiveloader
+package com.github.noman720.rxhloader.sample
 
 import org.junit.Test
 
