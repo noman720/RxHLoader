@@ -3,6 +3,7 @@ package com.github.noman720.rxhloader.core
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import androidx.annotation.NonNull
 import java.io.*
 import java.net.URLEncoder
 import java.nio.charset.Charset
@@ -22,36 +23,30 @@ class DiskBitmapCache private constructor(
         get() = "Disk Cache"
 
     @Synchronized
-    override fun <T> containsKey(key: String, clazz: Class<T>): Boolean {
-        val existingBitmap = get(key, clazz)
+    override fun containsKey(key: String): Boolean {
+        val existingBitmap = get(key)
         return existingBitmap != null
     }
 
     @Synchronized
-    override fun <T> get(key: String, clazz: Class<T>): T? {
+    override fun get(@NonNull key: String): Bitmap? {
         val cacheFileName = encodeKey(key)
         val foundCacheFiles = mCacheDirectory.listFiles { _, filename -> filename == cacheFileName }
         foundCacheFiles?.let {
             if (it.isNotEmpty()) {
-                when(clazz){
-                    Bitmap::class.java -> return readBitmapFromFile(foundCacheFiles[0]) as T
-                    else -> readDataFromFile(foundCacheFiles[0]) as T
-                }
+                return readBitmapFromFile(foundCacheFiles[0])
             }
         }
         return null
     }
 
     @Synchronized
-    override fun <T> save(key: String, dataToSave: T, clazz: Class<T>) {
+    override fun save(key: String, dataToSave: Bitmap) {
         val cacheFileName = encodeKey(key)
         cacheFileName?.apply {
             val cacheFile = File(mCacheDirectory, this)
             try {
-                when(clazz){
-                    Bitmap::class.java -> saveBitmapToFile(dataToSave, FileOutputStream(cacheFile))
-                    else -> saveDataToFile(dataToSave, FileOutputStream(cacheFile))
-                }
+                saveBitmapToFile(dataToSave, FileOutputStream(cacheFile))
             } catch (e: IOException) {
                 e.printStackTrace()
             }

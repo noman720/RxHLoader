@@ -3,8 +3,10 @@ package com.github.noman720.rxhloader.core
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.functions.Consumer
+import io.reactivex.functions.Predicate
 
 /**
  * Helper class for loading photos.
@@ -60,7 +62,7 @@ internal class ImageLoader private constructor(
     private fun saveToCache(imageUrl: String, bitmapCache: BitmapCache): Consumer<Bitmap> {
         return Consumer { bitmap ->
             Log.i(TAG, "Saving to: " + bitmapCache.name)
-            bitmapCache.save(imageUrl, bitmap, Bitmap::class.java)
+            bitmapCache.save(imageUrl, bitmap)
         }
     }
 
@@ -69,20 +71,24 @@ internal class ImageLoader private constructor(
      * The emitted item can be null if this cache source does not have anything to offer.
      */
     private fun loadFromCache(imageUrl: String, whichBitmapCache: BitmapCache): Observable<Bitmap> {
-        val imageBitmap = whichBitmapCache[imageUrl, Bitmap::class.java]
-        return Observable
-            .just(imageBitmap)
-//            .compose { observable ->
-//                observable.doOnNext {
-//                    val cacheName = whichBitmapCache.name
-//                    Log.i(TAG, "Checking: $cacheName")
-//                    if (it == null) {
-//                        Log.i(TAG, "Does not have this Url")
-//                    } else {
-//                        Log.i(TAG, "Url found in cache!")
-//                    }
-//                }
-//            }
+        val imageBitmap = whichBitmapCache[imageUrl]
+        return if (imageBitmap == null){
+            Completable.complete().toObservable()
+        } else {
+            Observable
+                .just(imageBitmap)
+                .compose { observable ->
+                    observable.doOnNext {
+                        val cacheName = whichBitmapCache.name
+                        Log.i(TAG, "Checking: $cacheName")
+                        if (it == null) {
+                            Log.i(TAG, "Does not have this Url")
+                        } else {
+                            Log.i(TAG, "Url found in cache!")
+                        }
+                    }
+                }
+        }
     }
 
     /**

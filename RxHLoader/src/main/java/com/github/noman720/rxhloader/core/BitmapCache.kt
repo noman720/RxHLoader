@@ -1,5 +1,7 @@
 package com.github.noman720.rxhloader.core
 
+import android.graphics.Bitmap
+
 /**
  * Interface for a fixed-size local storage.
  * Implemented by [MemoryBitmapCache] and [DiskBitmapCache].
@@ -16,17 +18,17 @@ interface BitmapCache {
     /**
      * Whether any object getInstance <var>key</var> exists
      */
-    fun <T> containsKey(key: String, clazz: Class<T>): Boolean
+    fun containsKey(key: String): Boolean
 
     /**
      * Gets the object mapped against <var>key</var>.
      */
-    operator fun <T> get(key: String, clazz: Class<T>): T?
+    operator fun get(key: String): Bitmap?
 
     /**
      * Saves <var>bitmapToSave</var> against <var>key</var>.
      */
-    fun <T> save(key: String, dataToSave: T, clazz: Class<T>)
+    fun save(key: String, dataToSave: Bitmap)
 
     /**
      * Deletes everything in this cache.
