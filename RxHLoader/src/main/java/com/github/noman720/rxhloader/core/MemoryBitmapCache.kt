@@ -1,5 +1,6 @@
 package com.github.noman720.rxhloader.core
 
+import android.util.Log
 import android.util.LruCache
 
 /**
@@ -26,6 +27,7 @@ class MemoryBitmapCache private constructor(): BitmapCache {
     }
 
     override fun <T> save(key: String, dataToSave: T, clazz: Class<T>) {
+        Log.i(name, "Saved ${clazz.canonicalName} successfully!")
         mCache.put(key, dataToSave)
     }
 

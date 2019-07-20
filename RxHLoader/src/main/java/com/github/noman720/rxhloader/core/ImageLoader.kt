@@ -1,8 +1,8 @@
 package com.github.noman720.rxhloader.core
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.util.Log
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.functions.Consumer
 
@@ -13,8 +13,8 @@ import io.reactivex.functions.Consumer
  * Created by Abu Noman on 7/20/19.
  */
 internal class ImageLoader private constructor(
-    private val mDiskCache: BitmapCache,
     private val mMemoryCache: BitmapCache,
+    private val mDiskCache: BitmapCache,
     private val mNetworkClient: NetworkClient
 ){
 
@@ -24,30 +24,31 @@ internal class ImageLoader private constructor(
      * 2. Disk cache   — if it was ever downloaded
      * 3. Network      — if it was never downloaded
      */
-    fun load(imageUrl: String): Observable<Bitmap> {
+    fun <T> load(imageUrl: String, clazz: Class<T>): Observable<T> {
         return Observable.just(imageUrl).flatMap { url ->
-            Log.d(TAG, "Loading image Url: $url")
+            Log.d(TAG, "Loading ${clazz.canonicalName} Url: $url")
 
             // Plan A: Check in memory
-            val memoryCacheLoadObs = loadFromCache(url, mMemoryCache)
+            val memoryCacheObservable = loadFromCache(url, mMemoryCache, clazz)
 
             // Plan B: Look into files
             // (And save into memory cache)
-            val diskImageObservable = loadFromCache(url, mDiskCache)
-                .doOnNext(saveToCache(url, mMemoryCache))
+            val diskCacheObservable = loadFromCache(url, mDiskCache, clazz)
+                .doOnNext(saveToCache(url, mMemoryCache, clazz))
 
             // Plan C: Hit the network
             // (And save into both memory and disk cache for future calls)
-            val networkLoadObs = Observable.defer {
+            val networkObservable = Observable.defer {
                 Log.i(TAG, "Downloading from the Internet")
                 mNetworkClient
-                    .loadImage(url)
-                    .doOnNext(saveToCache(url, mMemoryCache))
-                    .doOnNext(saveToCache(url, mDiskCache))
+                    .loadImage(url, clazz)
+                    .doOnNext(saveToCache(url, mMemoryCache, clazz))
+                    .doOnNext(saveToCache(url, mDiskCache, clazz))
+
             }
 
             Observable
-                .concat(memoryCacheLoadObs, diskImageObservable, networkLoadObs)
+                .concat(memoryCacheObservable, diskCacheObservable, networkObservable)
                 // Calling first() will stop the stream as soon as one item is emitted.
                 // This way, the cheapest source (memory) gets to emit first and the
                 // most expensive source (network) is only reached when no other source
@@ -57,10 +58,10 @@ internal class ImageLoader private constructor(
         }
     }
 
-    private fun saveToCache(imageUrl: String, bitmapCache: BitmapCache): Consumer<Bitmap> {
-        return Consumer { bitmap ->
+    private fun <T> saveToCache(imageUrl: String, bitmapCache: BitmapCache, clazz: Class<T>): Consumer<T> {
+        return Consumer { data ->
             Log.i(TAG, "Saving to: " + bitmapCache.name)
-            bitmapCache.save(imageUrl, bitmap, Bitmap::class.java)
+            bitmapCache.save(imageUrl, data, clazz)
         }
     }
 
@@ -68,21 +69,20 @@ internal class ImageLoader private constructor(
      * Returns a stream of the cached bitmap in <var>whichBitmapCache</var>.
      * The emitted item can be null if this cache source does not have anything to offer.
      */
-    private fun loadFromCache(imageUrl: String, whichBitmapCache: BitmapCache): Observable<Bitmap> {
-        val imageBitmap = whichBitmapCache[imageUrl, Bitmap::class.java]
-        return Observable
+    private fun <T> loadFromCache(imageUrl: String, whichBitmapCache: BitmapCache, clazz: Class<T>): Observable<T> {
+        val imageBitmap = whichBitmapCache[imageUrl, clazz]
+        val cacheName = whichBitmapCache.name
+        Log.i(TAG, "Checking: $cacheName")
+        return if (imageBitmap == null) {
+            Log.i(TAG, "Does not have this Url")
+            Completable.complete().toObservable()
+        } else Observable
             .just(imageBitmap)
-//            .compose { observable ->
-//                observable.doOnNext {
-//                    val cacheName = whichBitmapCache.name
-//                    Log.i(TAG, "Checking: $cacheName")
-//                    if (it == null) {
-//                        Log.i(TAG, "Does not have this Url")
-//                    } else {
-//                        Log.i(TAG, "Url found in cache!")
-//                    }
-//                }
-//            }
+            .compose { observable ->
+                observable.doOnNext {
+                    Log.i(TAG, "Url found in cache!")
+                }
+            }
     }
 
     /**

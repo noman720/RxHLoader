@@ -18,7 +18,7 @@ class NetworkClient private constructor(){
     /**
      * Loads an Image from the internet.
      */
-    fun loadImage(imageUrl: String): Observable<Bitmap> {
+    fun <T> loadImage(imageUrl: String, clazz: Class<T>): Observable<T> {
         return Observable.fromCallable {
             val loadRequest = Request.Builder()
                 .url(imageUrl)
@@ -28,9 +28,29 @@ class NetworkClient private constructor(){
                 .newCall(loadRequest)
                 .execute()
 
-            BitmapFactory.decodeStream(response.body()?.byteStream())
+            when(clazz){
+                Bitmap::class.java -> BitmapFactory.decodeStream(response.body()?.byteStream()) as T
+                else -> response.body()?.string() as T
+            }
         }
     }
+
+//    /**
+//     * Loads data from the internet.
+//     */
+//    fun loadData(dataUrl: String): Observable<String> {
+//        return Observable.fromCallable {
+//            val loadRequest = Request.Builder()
+//                .url(dataUrl)
+//                .build()
+//
+//            val response = mOkHttpClient
+//                .newCall(loadRequest)
+//                .execute()
+//
+//            response.body()?.string()
+//        }
+//    }
 
     companion object {
 

@@ -16,21 +16,25 @@ class SyncMaster private constructor(
     private val imageLoader: ImageLoader
 ){
 
-    private var observable: Observable<Bitmap>? = null
+    private var imageObservable: Observable<Bitmap>? = null
 
     fun load(imageUrl: String): SyncMaster{
-        this.observable = imageLoader.load(imageUrl)
+        this.imageObservable = imageLoader.load(imageUrl, Bitmap::class.java)
         return this
     }
 
     fun into(imageView: ImageView){
-        this.observable?.run {
+        this.imageObservable?.run {
             this.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe {
                 it?.let {
                     imageView.setImageBitmap(it)
                 }
             }
         }
+    }
+
+    fun fetch(dataUrl: String): Observable<String> {
+        return imageLoader.load(dataUrl, String::class.java)
     }
 
     companion object {

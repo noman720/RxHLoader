@@ -3,6 +3,7 @@ package com.github.noman720.rxhloader.core
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import java.io.*
 import java.net.URLEncoder
 import java.nio.charset.Charset
@@ -117,6 +118,7 @@ class DiskBitmapCache private constructor(
         // auto close file output stream
         fileOutputStream.use {
             (bitmapToSave as Bitmap).compress(Bitmap.CompressFormat.PNG, 100, it)
+            Log.i(name, "Saved image successfully!")
         }
     }
 
@@ -125,6 +127,7 @@ class DiskBitmapCache private constructor(
         // auto close file output stream
         fileOutputStream.use {
             it.write((dataToSave as String).toByteArray(Charset.forName("UTF-8")))
+            Log.i(name, "Saved data successfully!")
         }
     }
 
