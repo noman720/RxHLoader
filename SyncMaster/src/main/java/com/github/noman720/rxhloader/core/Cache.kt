@@ -2,11 +2,11 @@ package com.github.noman720.rxhloader.core
 
 /**
  * Interface for a fixed-size local storage.
- * Implemented by [MemoryBitmapCache] and [DiskBitmapCache].
+ * Implemented by [MemoryCache] and [DiskCache].
  *
  * Created by Abu Noman on 7/20/19.
  */
-interface BitmapCache {
+interface Cache {
 
     /**
      * For debugging
