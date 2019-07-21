@@ -11,10 +11,10 @@ import java.nio.charset.Charset
  *
  * Created by Abu Noman on 7/20/19.
  */
-class MemoryBitmapCache private constructor(
+class MemoryCache private constructor(
     private val bitmapCache: LruCache<String, Bitmap>,
     private val dataCache: LruCache<String, String>
-): BitmapCache {
+): Cache {
 
     override val name: String
         get() = "Memory Cache"
@@ -70,11 +70,11 @@ class MemoryBitmapCache private constructor(
         }
 
         @Volatile
-        private var sMemoryCache: MemoryBitmapCache? = null
+        private var sMemoryCache: MemoryCache? = null
 
-        fun getInstance(): MemoryBitmapCache =
+        fun getInstance(): MemoryCache =
             sMemoryCache?: synchronized(this){
-                sMemoryCache?: MemoryBitmapCache(mBitmapCache, mDataCache)
+                sMemoryCache?: MemoryCache(mBitmapCache, mDataCache)
             }
     }
 

@@ -13,9 +13,9 @@ import java.nio.charset.Charset
  *
  * Created by Abu Noman on 7/20/19.
  */
-class DiskBitmapCache private constructor(
+class DiskCache private constructor(
     context: Context
-) : BitmapCache {
+) : Cache {
 
     private val mCacheDirectory: File = context.cacheDir
 
@@ -133,15 +133,15 @@ class DiskBitmapCache private constructor(
     companion object {
 
         @Volatile
-        private var sDiskCache: DiskBitmapCache? = null
+        private var sDiskCache: DiskCache? = null
 
         // Nested null check is required if a 2nd thread manages to get
         // queued for this synchronized block while the 1st thread was
         // already executing inside this block, instantiating the object.
 
-        fun getInstance(context: Context): DiskBitmapCache =
+        fun getInstance(context: Context): DiskCache =
             sDiskCache?: synchronized(this){
-                sDiskCache?: DiskBitmapCache(context)
+                sDiskCache?: DiskCache(context)
             }
     }
 

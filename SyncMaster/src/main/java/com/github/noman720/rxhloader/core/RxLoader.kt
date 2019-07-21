@@ -12,9 +12,9 @@ import io.reactivex.functions.Consumer
  *
  * Created by Abu Noman on 7/20/19.
  */
-internal class ImageLoader private constructor(
-    private val mMemoryCache: BitmapCache,
-    private val mDiskCache: BitmapCache,
+internal class RxLoader private constructor(
+    private val mMemoryCache: Cache,
+    private val mDiskCache: Cache,
     private val mNetworkClient: NetworkClient
 ){
 
@@ -58,20 +58,20 @@ internal class ImageLoader private constructor(
         }
     }
 
-    private fun <T> saveToCache(imageUrl: String, bitmapCache: BitmapCache, clazz: Class<T>): Consumer<T> {
+    private fun <T> saveToCache(imageUrl: String, cache: Cache, clazz: Class<T>): Consumer<T> {
         return Consumer { data ->
-            Log.i(TAG, "Saving to: " + bitmapCache.name)
-            bitmapCache.save(imageUrl, data, clazz)
+            Log.i(TAG, "Saving to: " + cache.name)
+            cache.save(imageUrl, data, clazz)
         }
     }
 
     /**
-     * Returns a stream of the cached bitmap in <var>whichBitmapCache</var>.
+     * Returns a stream of the cached bitmap in <var>whichCache</var>.
      * The emitted item can be null if this cache source does not have anything to offer.
      */
-    private fun <T> loadFromCache(imageUrl: String, whichBitmapCache: BitmapCache, clazz: Class<T>): Observable<T> {
-        val imageBitmap = whichBitmapCache[imageUrl, clazz]
-        val cacheName = whichBitmapCache.name
+    private fun <T> loadFromCache(imageUrl: String, whichCache: Cache, clazz: Class<T>): Observable<T> {
+        val imageBitmap = whichCache[imageUrl, clazz]
+        val cacheName = whichCache.name
 //        Log.i(TAG, "Checking: $cacheName")
         return if (imageBitmap == null) {
             Log.i(TAG, "Does not have this Url in $cacheName!")
@@ -95,16 +95,16 @@ internal class ImageLoader private constructor(
 
     companion object {
 
-        const val TAG = "ImageLoader"
+        const val TAG = "RxLoader"
 
         @Volatile
-        private var sImageLoader: ImageLoader? = null
+        private var sRxLoader: RxLoader? = null
 
-        fun getInstance(context: Context): ImageLoader =
-            sImageLoader?: synchronized(this) {
-                sImageLoader?: ImageLoader(
-                    MemoryBitmapCache.getInstance(),
-                    DiskBitmapCache.getInstance(context),
+        fun getInstance(context: Context): RxLoader =
+            sRxLoader?: synchronized(this) {
+                sRxLoader?: RxLoader(
+                    MemoryCache.getInstance(),
+                    DiskCache.getInstance(context),
                     NetworkClient.getInstance()
                 )
             }

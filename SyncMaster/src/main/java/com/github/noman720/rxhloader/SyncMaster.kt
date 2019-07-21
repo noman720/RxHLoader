@@ -3,7 +3,7 @@ package com.github.noman720.rxhloader
 import android.content.Context
 import android.graphics.Bitmap
 import android.widget.ImageView
-import com.github.noman720.rxhloader.core.ImageLoader
+import com.github.noman720.rxhloader.core.RxLoader
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -13,13 +13,13 @@ import io.reactivex.schedulers.Schedulers
  */
 
 class SyncMaster private constructor(
-    private val imageLoader: ImageLoader
+    private val rxLoader: RxLoader
 ){
 
     private var imageObservable: Observable<Bitmap>? = null
 
     fun load(imageUrl: String): SyncMaster{
-        this.imageObservable = imageLoader.load(imageUrl, Bitmap::class.java)
+        this.imageObservable = rxLoader.load(imageUrl, Bitmap::class.java)
         return this
     }
 
@@ -36,7 +36,7 @@ class SyncMaster private constructor(
     }
 
     fun fetch(dataUrl: String): Observable<String> {
-        return imageLoader.load(dataUrl, String::class.java)
+        return rxLoader.load(dataUrl, String::class.java)
     }
 
     companion object {
@@ -47,7 +47,7 @@ class SyncMaster private constructor(
         fun with(context: Context): SyncMaster =
             INSTANCE?: synchronized(this) {
                 INSTANCE?: SyncMaster(
-                    ImageLoader.getInstance(context)
+                    RxLoader.getInstance(context)
                 )
             }
     }
