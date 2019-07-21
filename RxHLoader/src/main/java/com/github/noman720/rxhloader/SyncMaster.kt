@@ -25,11 +25,13 @@ class SyncMaster private constructor(
 
     fun into(imageView: ImageView){
         this.imageObservable?.run {
-            this.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe {
+            this.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe ({
                 it?.let {
                     imageView.setImageBitmap(it)
                 }
-            }
+            }, {
+                imageView.setImageResource(R.drawable.ic_person)
+            })
         }
     }
 

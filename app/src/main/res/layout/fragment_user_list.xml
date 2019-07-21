@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="com.github.noman720.rxhloader.sample.utils.ApiStatus"/>
+        <variable
+                name="viewModel"
+                type="com.github.noman720.rxhloader.sample.ui.UserListViewModel" />
+    </data>
+
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:refreshing="@{viewModel.fetchingStatus == ApiStatus.IN_PROGRESS ? true : false}"
+            app:onRefreshListener="@{() -> viewModel.onRefresh()}">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/white">
+
+            <TextView
+                    android:id="@+id/loading_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="@{viewModel.getMessage}"
+                    android:textAlignment="center"
+                    app:showHideMessage="@{viewModel.fetchingStatus}"/>
+
+            <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/list_view_vehicles"
+                        android:contentDescription="@string/app_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="18dp"
+                        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        app:data="@{viewModel.getUsers}"
+                        app:showHideList="@{viewModel.fetchingStatus}"/>
+            </RelativeLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+</layout>

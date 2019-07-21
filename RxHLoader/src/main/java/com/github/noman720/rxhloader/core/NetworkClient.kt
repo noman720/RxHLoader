@@ -35,25 +35,7 @@ class NetworkClient private constructor(){
         }
     }
 
-//    /**
-//     * Loads data from the internet.
-//     */
-//    fun loadData(dataUrl: String): Observable<String> {
-//        return Observable.fromCallable {
-//            val loadRequest = Request.Builder()
-//                .url(dataUrl)
-//                .build()
-//
-//            val response = mOkHttpClient
-//                .newCall(loadRequest)
-//                .execute()
-//
-//            response.body()?.string()
-//        }
-//    }
-
     companion object {
-
         fun getInstance() = NetworkClient()
     }
 
