@@ -34,8 +34,8 @@ class DiskBitmapCache private constructor(
         val foundCacheFiles = mCacheDirectory.listFiles { _, filename -> filename == cacheFileName }
         foundCacheFiles?.let {
             if (it.isNotEmpty()) {
-                when(clazz){
-                    Bitmap::class.java -> return readBitmapFromFile(foundCacheFiles[0]) as T
+                return when(clazz){
+                    Bitmap::class.java -> readBitmapFromFile(foundCacheFiles[0]) as T
                     else -> readDataFromFile(foundCacheFiles[0]) as T
                 }
             }
@@ -50,8 +50,8 @@ class DiskBitmapCache private constructor(
             val cacheFile = File(mCacheDirectory, this)
             try {
                 when(clazz){
-                    Bitmap::class.java -> saveBitmapToFile(dataToSave, FileOutputStream(cacheFile))
-                    else -> saveDataToFile(dataToSave, FileOutputStream(cacheFile))
+                    Bitmap::class.java -> saveBitmapToFile(dataToSave as Bitmap, FileOutputStream(cacheFile))
+                    else -> saveDataToFile(dataToSave as String, FileOutputStream(cacheFile))
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -91,7 +91,6 @@ class DiskBitmapCache private constructor(
         try {
             val fileInputStream = FileInputStream(foundCacheFile)
             return BitmapFactory.decodeStream(fileInputStream)
-
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
         }
@@ -114,19 +113,19 @@ class DiskBitmapCache private constructor(
     }
 
     @Throws(IOException::class)
-    private fun <T> saveBitmapToFile(bitmapToSave: T, fileOutputStream: FileOutputStream) {
+    private fun saveBitmapToFile(bitmapToSave: Bitmap, fileOutputStream: FileOutputStream) {
         // auto close file output stream
         fileOutputStream.use {
-            (bitmapToSave as Bitmap).compress(Bitmap.CompressFormat.PNG, 100, it)
+            bitmapToSave.compress(Bitmap.CompressFormat.PNG, 100, it)
             Log.i(name, "Saved image successfully!")
         }
     }
 
     @Throws(IOException::class)
-    private fun <T> saveDataToFile(dataToSave: T, fileOutputStream: FileOutputStream) {
+    private fun saveDataToFile(dataToSave: String, fileOutputStream: FileOutputStream) {
         // auto close file output stream
         fileOutputStream.use {
-            it.write((dataToSave as String).toByteArray(Charset.forName("UTF-8")))
+            it.write(dataToSave.toByteArray(Charset.forName("UTF-8")))
             Log.i(name, "Saved data successfully!")
         }
     }

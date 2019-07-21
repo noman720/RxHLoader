@@ -31,6 +31,10 @@ class MainActivity : AppCompatActivity() {
                 .subscribe {
                     Log.d("Sync", it)
                 }
+
+//            SyncMaster.with(this)
+//                .load("https://images.unsplash.com/photo-1464550883968-cec281c19761?ixlib=rb-0.3.5\\u0026q=80\\u0026fm=jpg\\u0026crop=entropy\\u0026w=200\\u0026fit=max\\u0026s=9fba74be19d78b1aa2495c0200b9fbce")
+//                .into(imageView)
         }
     }
 

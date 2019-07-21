@@ -72,15 +72,15 @@ internal class ImageLoader private constructor(
     private fun <T> loadFromCache(imageUrl: String, whichBitmapCache: BitmapCache, clazz: Class<T>): Observable<T> {
         val imageBitmap = whichBitmapCache[imageUrl, clazz]
         val cacheName = whichBitmapCache.name
-        Log.i(TAG, "Checking: $cacheName")
+//        Log.i(TAG, "Checking: $cacheName")
         return if (imageBitmap == null) {
-            Log.i(TAG, "Does not have this Url")
+            Log.i(TAG, "Does not have this Url in $cacheName!")
             Completable.complete().toObservable()
         } else Observable
             .just(imageBitmap)
             .compose { observable ->
                 observable.doOnNext {
-                    Log.i(TAG, "Url found in cache!")
+                    Log.i(TAG, "Url found in $cacheName!")
                 }
             }
     }
