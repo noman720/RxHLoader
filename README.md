@@ -7,7 +7,23 @@ Android reactive hybrid loader for loading Image, JSON, XML etc.
 # How to use?
 
 1. Import the library to your applicaton (will provide gradle dependencies later)
-2. To load data (XML, JSON, etc) add the following line.
+
+> Add maven repository to your root gradle
+```gradle
+allprojects {
+        repositories {
+                ...
+                maven { url 'https://jitpack.io' }
+        }
+}
+```
+> Add denpendency to your project
+```gradle
+implementation 'com.github.noman720:RxHLoader:0.1.0'
+```
+
+2. To load data (XML, JSON, etc) add the following line
+
 ```kotlin
 SyncMaster.with(this)
         .fetch("http://pastebin.com/raw/wgkJgazE")
@@ -17,6 +33,7 @@ SyncMaster.with(this)
             Log.d("Sync", it)
         }
 ```
+
 3. To load image use the following line
 
 ```kotlin
