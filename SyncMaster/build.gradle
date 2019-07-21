@@ -4,12 +4,11 @@ apply plugin: 'kotlin-android'
 
 
 android {
-    compileSdkVersion 28
-
+    compileSdkVersion deps.build.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 28
+        minSdkVersion deps.build.minSdkVersion
+        targetSdkVersion deps.build.targetSdkVersion
         versionCode 1
         versionName "1.0"
 
@@ -30,6 +29,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
+    // Jeetpack
     api "androidx.appcompat:appcompat:$appcompat_version"
     api "androidx.core:core-ktx:$ktx_version"
 
