@@ -2,7 +2,7 @@
 Android reactive hybrid loader for loading Image, JSON, XML etc.
 
 # Sample List View using the RxHLoader library
-![Alt text](https://github.com/noman720/RxHLoader/blob/development_doc/doc/sample_app_screen.gif "Sample List")
+![Alt text](https://github.com/noman720/RxHLoader/blob/master/doc/sample_app_screen.gif "Sample List")
 
 # How to use?
 
